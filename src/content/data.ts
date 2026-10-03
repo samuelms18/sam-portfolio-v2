@@ -13,6 +13,10 @@ export const site: Site = {
   "email": "stuvat18@gmail.com",
   "resume": "",
   "photo": "/images/sam.jpg",
+  "introVideo": "",
+  "introPreview": "",
+  "introCaptions": "",
+  "introLength": "",
   "socials": {
     "linkedin": "",
     "github": "",

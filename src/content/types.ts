@@ -14,6 +14,14 @@ export type Site = {
   /** Path under /public, e.g. "/Sam-Resume.pdf". Empty hides the button. */
   resume: string;
   photo: string;
+  /** Self-intro video under /public, e.g. "/videos/intro.mp4". Empty shows the photo instead. */
+  introVideo: string;
+  /** Optional short, silent loop for the hero card (defaults to introVideo, muted). */
+  introPreview: string;
+  /** Optional WebVTT subtitles, e.g. "/videos/intro.vtt". */
+  introCaptions: string;
+  /** Shown on the play button, e.g. "0:45". */
+  introLength: string;
   socials: Socials;
   currently: string;
 };

@@ -2,14 +2,14 @@
 
 Portfolio of **Sam, UI/UX Designer & UI/UX Developer**, built in the **Depth** direction: glass planes over a deep emerald scene lit by teal and coral light.
 
-**Stack (all free):** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Motion · GSAP (ScrollTrigger, SplitText) · Three.js + React Three Fiber · hosted on Vercel.
+**Stack (all free):** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Motion · GSAP (ScrollTrigger, SplitText) · hosted on Vercel.
 
 ## Roadmap
 
 | Stage | What | Status |
 |---|---|---|
 | 1 | Foundation: design system, all pages, content, preloader, theme toggle, page-to-case-study morph | ✅ |
-| 2 | 3D hero: floating glass UI screens (dashboard, mobile app, planner, widgets) layered around the photo; they snap into an aligned layout on scroll | ✅ |
+| 2 | Hero self-intro video: silent looping preview in the hero card, full video with sound in a dialog (photo until the video is added) | ✅ |
 | 3 | Scroll storytelling (GSAP): masked heading reveals, depth-in cards, pinned horizontal process, pinned wireframe → visual wipe, scroll-reactive marquee, hero scroll-out, page transitions | ✅ |
 | 4 | Sanity CMS: edit projects, photos and text from a dashboard | Next |
 
@@ -41,6 +41,12 @@ src/app/globals.css      ← design tokens (both themes) and component styles
 3. Every push to `main` redeploys automatically.
 4. Optional: set `NEXT_PUBLIC_WEB3FORMS_KEY` (see `.env.example`) so the contact form sends emails directly.
 5. If your Vercel address differs from `https://sam-portfolio-v2.vercel.app`, update `site.url` in `src/content/data.ts`.
+
+## Intro video
+
+1. Put the files in `public/videos/` — `intro.mp4` (H.264 + AAC), optionally `intro-preview.mp4` (5–8 s, silent loop) and `intro.vtt` (subtitles).
+2. In `src/content/data.ts` set `introVideo: "/videos/intro.mp4"`, `introLength: "0:45"`, and optionally `introPreview` / `introCaptions`.
+3. Keep `intro.mp4` under ~15 MB (1080p, CRF 23–26, `-movflags +faststart`) so it starts fast.
 
 ## Content checklist
 

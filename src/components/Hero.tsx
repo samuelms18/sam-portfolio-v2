@@ -1,13 +1,12 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { site } from '@/content/data';
 import { gsap, MOTION_OK, useGSAP } from '@/lib/gsap';
 import { usePreloaded } from '@/lib/usePreloaded';
-import { HeroCanvas } from './HeroCanvas';
+import { IntroVideo } from './IntroVideo';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -22,20 +21,13 @@ export function Hero() {
   const ready = usePreloaded();
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  // CSS spheres are the fallback; they fade out once the WebGL scene is running.
-  const [scene, setScene] = useState(false);
-  const cssOrb = `transition-opacity duration-1000 ${scene ? '!opacity-0' : ''}`;
 
   // Pointer position in the hero, -0.5 … 0.5, smoothed.
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   const mx = useSpring(px, { stiffness: 60, damping: 18 });
   const my = useSpring(py, { stiffness: 60, damping: 18 });
-  const rotY = useTransform(mx, (v) => -12 + v * 16);
-  const rotX = useTransform(my, (v) => 4 - v * 12);
 
-  const far = useDepth(mx, my, -0.6);
   const mid = useDepth(mx, my, 0.5);
   const near = useDepth(mx, my, 1.3);
   const nearer = useDepth(mx, my, 1.8);
@@ -77,10 +69,8 @@ export function Hero() {
       onPointerLeave={onLeave}
       className="relative isolate flex min-h-[100svh] items-center overflow-hidden pt-32 pb-20"
     >
-      <HeroCanvas anchorRef={cardRef} sectionRef={ref} onReady={() => setScene(true)} />
-      {/* Light sources (fallback) */}
-      <motion.span style={far} className={`${cssOrb} orb orb-teal -z-10 right-[2vw] top-[8vh] h-[34vw] max-h-[460px] w-[34vw] max-w-[460px] opacity-50 blur-[2px]`} aria-hidden="true" />
-      <motion.span style={mid} className={`${cssOrb} orb orb-pearl -z-10 right-[44vw] bottom-[12vh] h-10 w-10 opacity-70 max-lg:hidden`} aria-hidden="true" />
+      {/* Soft light behind the video card */}
+      <span className="pointer-events-none absolute right-[-10vw] top-[5vh] -z-10 h-[70vh] w-[60vw] rounded-full bg-[radial-gradient(circle,rgba(31,209,178,.18),transparent_65%)]" aria-hidden="true" />
 
       <div className="container-x grid items-center gap-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)]">
         <div className="relative z-10 flex min-w-0 flex-col gap-7">
@@ -111,38 +101,30 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Photo on a glass plane, with floating info cards at different depths */}
+        {/* Self-intro video (photo until the video is added), with floating info cards */}
         <div className="hero-card-lag">
         <motion.div
-          ref={cardRef}
           initial={reduce ? false : { opacity: 0, scale: 0.92 }}
           animate={ready ? { opacity: 1, scale: 1 } : undefined}
           transition={{ duration: 1.4, delay: 0.25, ease }}
-          className="relative mx-auto w-full max-w-[420px] [perspective:1200px] max-lg:max-w-[340px]"
+          className="relative mx-auto w-full max-w-[420px] max-lg:max-w-[340px]"
         >
-          <motion.div
-            style={reduce ? undefined : { rotateY: rotY, rotateX: rotX }}
-            className="glass relative rounded-[28px] p-2.5 shadow-[var(--shadow)] [transform-style:preserve-3d]"
-          >
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[20px]">
-              <Image src={site.photo} alt={`Portrait of ${site.name}`} fill priority sizes="(max-width: 1024px) 340px, 420px" className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-            </div>
-          </motion.div>
+          <div className="glass relative rounded-[28px] p-2.5 shadow-[var(--shadow)]">
+            <IntroVideo />
+          </div>
 
-          <motion.div style={near} className="glass-dense absolute -left-10 bottom-24 grid gap-0.5 rounded-2xl px-5 py-3.5 max-sm:-left-3">
+          <motion.div style={near} className="glass-dense pointer-events-none absolute -left-10 top-[42%] grid gap-0.5 rounded-2xl px-5 py-3.5 max-sm:-left-3">
             <span className="text-xs text-[var(--muted)]">Currently</span>
             <b className="text-[15px]">{site.currently}</b>
           </motion.div>
-          <motion.div style={nearer} className="glass-dense absolute -right-8 -bottom-6 grid gap-0.5 rounded-2xl px-5 py-3.5 max-sm:-right-3">
+          <motion.div style={nearer} className="glass-dense pointer-events-none absolute -right-8 bottom-24 grid gap-0.5 rounded-2xl px-5 py-3.5 max-sm:-right-3">
             <span className="text-xs text-[var(--muted)]">Focus</span>
             <b className="text-[15px]">Enterprise UX · Data</b>
           </motion.div>
-          <motion.div style={mid} className="glass-dense absolute -right-6 top-10 grid gap-0.5 rounded-2xl px-4 py-3 max-sm:-right-2">
+          <motion.div style={mid} className="glass-dense pointer-events-none absolute -right-6 top-16 grid gap-0.5 rounded-2xl px-4 py-3 max-sm:-right-2">
             <span className="text-xs text-[var(--muted)]">Experience</span>
             <b className="text-[15px]">~3 years</b>
           </motion.div>
-          <motion.span style={nearer} className={`${cssOrb} orb orb-coral -left-14 top-[38%] h-16 w-16 max-sm:-left-4 max-sm:h-12 max-sm:w-12`} aria-hidden="true" />
         </motion.div>
         </div>
       </div>
