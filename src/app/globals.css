@@ -277,3 +277,5 @@ html:not(.is-loading) .preloader[data-phase="idle"] { display: none; }
 .marquee-track { animation: marquee 40s linear infinite; }
 .marquee:hover .marquee-track { animation-play-state: paused; }
 @keyframes marquee { to { transform: translateX(-50%); } }
+
+@keyframes fadein { from { opacity: 0; } }

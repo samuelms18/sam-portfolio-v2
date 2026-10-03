@@ -3,9 +3,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { site } from '@/content/data';
 import { usePreloaded } from '@/lib/usePreloaded';
+import { HeroCanvas } from './HeroCanvas';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -20,6 +21,10 @@ export function Hero() {
   const ready = usePreloaded();
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  // CSS spheres are the fallback; they fade out once the WebGL scene is running.
+  const [scene, setScene] = useState(false);
+  const cssOrb = `transition-opacity duration-1000 ${scene ? '!opacity-0' : ''}`;
 
   // Pointer position in the hero, -0.5 … 0.5, smoothed.
   const px = useMotionValue(0);
@@ -57,9 +62,10 @@ export function Hero() {
       onPointerLeave={onLeave}
       className="relative isolate flex min-h-[100svh] items-center overflow-hidden pt-32 pb-20"
     >
-      {/* Light sources */}
-      <motion.span style={far} className="orb orb-teal -z-10 right-[2vw] top-[8vh] h-[34vw] max-h-[460px] w-[34vw] max-w-[460px] opacity-50 blur-[2px]" aria-hidden="true" />
-      <motion.span style={mid} className="orb orb-pearl -z-10 right-[44vw] bottom-[12vh] h-10 w-10 opacity-70 max-lg:hidden" aria-hidden="true" />
+      <HeroCanvas anchorRef={cardRef} sectionRef={ref} onReady={() => setScene(true)} />
+      {/* Light sources (fallback) */}
+      <motion.span style={far} className={`${cssOrb} orb orb-teal -z-10 right-[2vw] top-[8vh] h-[34vw] max-h-[460px] w-[34vw] max-w-[460px] opacity-50 blur-[2px]`} aria-hidden="true" />
+      <motion.span style={mid} className={`${cssOrb} orb orb-pearl -z-10 right-[44vw] bottom-[12vh] h-10 w-10 opacity-70 max-lg:hidden`} aria-hidden="true" />
 
       <div className="container-x grid items-center gap-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)]">
         <div className="relative z-10 flex min-w-0 flex-col gap-7">
@@ -92,6 +98,7 @@ export function Hero() {
 
         {/* Photo on a glass plane, with floating info cards at different depths */}
         <motion.div
+          ref={cardRef}
           initial={reduce ? false : { opacity: 0, scale: 0.92 }}
           animate={ready ? { opacity: 1, scale: 1 } : undefined}
           transition={{ duration: 1.4, delay: 0.25, ease }}
@@ -119,7 +126,7 @@ export function Hero() {
             <span className="text-xs text-[var(--muted)]">Experience</span>
             <b className="text-[15px]">~3 years</b>
           </motion.div>
-          <motion.span style={nearer} className="orb orb-coral -left-14 top-[38%] h-16 w-16 max-sm:-left-4 max-sm:h-12 max-sm:w-12" aria-hidden="true" />
+          <motion.span style={nearer} className={`${cssOrb} orb orb-coral -left-14 top-[38%] h-16 w-16 max-sm:-left-4 max-sm:h-12 max-sm:w-12`} aria-hidden="true" />
         </motion.div>
       </div>
 

@@ -2,15 +2,15 @@
 
 Portfolio of **Sam, UI/UX Designer & UI/UX Developer**, built in the **Depth** direction: glass planes over a deep emerald scene lit by teal and coral light.
 
-**Stack (all free):** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Motion · hosted on Vercel.
+**Stack (all free):** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Motion · Three.js + React Three Fiber · hosted on Vercel.
 
 ## Roadmap
 
 | Stage | What | Status |
 |---|---|---|
 | 1 | Foundation: design system, all pages, content, preloader, theme toggle, page-to-case-study morph | ✅ |
-| 2 | Real 3D hero (React Three Fiber): glass spheres with lighting and refraction | Next |
-| 3 | Scroll storytelling (GSAP ScrollTrigger) and route transitions | |
+| 2 | Real 3D hero (React Three Fiber): lit planet, orbiting sphere, glass spheres, procedural studio lighting | ✅ |
+| 3 | Scroll storytelling (GSAP ScrollTrigger) and route transitions | Next |
 | 4 | Sanity CMS: edit projects, photos and text from a dashboard | |
 
 ## Run locally
