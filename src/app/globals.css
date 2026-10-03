@@ -273,9 +273,22 @@ img { max-width: 100%; }
 html:not(.is-loading) .preloader[data-phase="idle"] { display: none; }
 .is-loading body { overflow: hidden; }
 
-/* Marquee */
-.marquee-track { animation: marquee 40s linear infinite; }
-.marquee:hover .marquee-track { animation-play-state: paused; }
-@keyframes marquee { to { transform: translateX(-50%); } }
-
 @keyframes fadein { from { opacity: 0; } }
+
+/* ── Stage 3: scroll storytelling ─────────────────────── */
+.split-line { padding-bottom: 0.06em; }
+
+/* Wireframe → visual comparison (pinned wipe on tablets and up) */
+.wv-layer { position: relative; }
+.wv-label { position: absolute; top: 14px; left: 14px; padding: 6px 10px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 70%, transparent); border: 1px solid var(--glass-line); }
+.wv-label-r { left: auto; right: 14px; }
+.wv-line { display: none; }
+.wire-visual:not(.is-compare) .wv-top { margin-top: 8px; }
+.is-compare .wv-top { position: absolute; inset: 0; clip-path: inset(0 100% 0 0); }
+.is-compare .wv-line { display: block; position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: linear-gradient(var(--teal), var(--coral)); box-shadow: 0 0 24px var(--teal); }
+
+/* Page transitions */
+::view-transition-old(.page-exit) { animation: 220ms cubic-bezier(0.4, 0, 1, 1) both page-out; }
+::view-transition-new(.page-enter) { animation: 520ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both page-in; }
+@keyframes page-out { to { opacity: 0; transform: translateY(-24px); filter: blur(6px); } }
+@keyframes page-in { from { opacity: 0; transform: translateY(32px); filter: blur(6px); } }

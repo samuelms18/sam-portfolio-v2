@@ -28,7 +28,7 @@ export function WorkGrid({ items }: { items: Item[] }) {
       </div>
       <div className="mt-10 grid gap-6 md:grid-cols-2">
         {shown.map((i) => (
-          <div key={i.key}>{i.node}</div>
+          <div key={i.key} className="min-w-0">{i.node}</div>
         ))}
       </div>
     </>

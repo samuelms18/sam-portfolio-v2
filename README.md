@@ -2,7 +2,7 @@
 
 Portfolio of **Sam, UI/UX Designer & UI/UX Developer**, built in the **Depth** direction: glass planes over a deep emerald scene lit by teal and coral light.
 
-**Stack (all free):** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Motion · Three.js + React Three Fiber · hosted on Vercel.
+**Stack (all free):** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Motion · GSAP (ScrollTrigger, SplitText) · Three.js + React Three Fiber · hosted on Vercel.
 
 ## Roadmap
 
@@ -10,8 +10,8 @@ Portfolio of **Sam, UI/UX Designer & UI/UX Developer**, built in the **Depth** d
 |---|---|---|
 | 1 | Foundation: design system, all pages, content, preloader, theme toggle, page-to-case-study morph | ✅ |
 | 2 | 3D hero "The Untangling": a glass knot around the photo that untangles into a clean ring on scroll, plus floating 3D UI objects | ✅ |
-| 3 | Scroll storytelling (GSAP ScrollTrigger) and route transitions | Next |
-| 4 | Sanity CMS: edit projects, photos and text from a dashboard | |
+| 3 | Scroll storytelling (GSAP): masked heading reveals, depth-in cards, pinned horizontal process, pinned wireframe → visual wipe, scroll-reactive marquee, hero scroll-out, page transitions | ✅ |
+| 4 | Sanity CMS: edit projects, photos and text from a dashboard | Next |
 
 ## Run locally
 

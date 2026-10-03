@@ -3,12 +3,16 @@ import Link from 'next/link';
 import { Hero } from '@/components/Hero';
 import { ProjectCard } from '@/components/ProjectCard';
 import { Reveal } from '@/components/Reveal';
-import { ExperienceList, Exploring, Marquee, ProcessSteps, SectionHead, SkillsGrid } from '@/components/Sections';
+import { Marquee } from '@/components/Marquee';
+import { PageTransition } from '@/components/PageTransition';
+import { ProcessSection } from '@/components/ProcessSection';
+import { DepthIn } from '@/components/ScrollFX';
+import { ExperienceList, Exploring, SectionHead, SkillsGrid } from '@/components/Sections';
 import { bio, domains, projects, site } from '@/content/data';
 
 export default function Home() {
   return (
-    <>
+    <PageTransition>
       <Hero />
       <Marquee items={domains} />
 
@@ -23,9 +27,9 @@ export default function Home() {
           </SectionHead>
           <div className="grid gap-6 md:grid-cols-2">
             {projects.map((p, i) => (
-              <Reveal key={p.slug} delay={(i % 2) * 0.1}>
+              <DepthIn key={p.slug}>
                 <ProjectCard project={p} index={i} total={projects.length} size={i < 2 ? 'lg' : 'md'} />
-              </Reveal>
+              </DepthIn>
             ))}
           </div>
           <Reveal className="mt-14 flex justify-center">
@@ -36,7 +40,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section overflow-x-clip">
         <div className="container-x grid items-center gap-12 lg:grid-cols-[0.8fr_1.2fr]">
           <Reveal className="relative mx-auto w-full max-w-[380px]">
             <div className="glass rounded-[28px] p-2.5">
@@ -73,14 +77,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section">
-        <div className="container-x">
+      <ProcessSection
+        head={
           <SectionHead num="03" eyebrow="Process">
             From messy requirements <span className="grad">to shipped screens.</span>
           </SectionHead>
-          <ProcessSteps />
-        </div>
-      </section>
+        }
+      />
 
       <section className="section">
         <div className="container-x">
@@ -124,6 +127,6 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
-    </>
+    </PageTransition>
   );
 }

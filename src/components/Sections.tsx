@@ -1,32 +1,24 @@
-import type { CSSProperties, ReactNode } from 'react';
-import { education, experience, exploring, process, skills } from '@/content/data';
+import type { ReactNode } from 'react';
+import { education, experience, exploring, skills } from '@/content/data';
 import { Reveal } from './Reveal';
+import { SplitHeading } from './ScrollFX';
 
 export function SectionHead({ eyebrow, num, children, lede }: { eyebrow: string; num?: string; children: ReactNode; lede?: string }) {
   return (
-    <Reveal className="mb-14 grid gap-5">
-      <span className="eyebrow">
-        {num && <b>{num}</b>}
-        {eyebrow}
-      </span>
-      <h2 className="sec-title max-w-[18ch]">{children}</h2>
-      {lede && <p className="lede">{lede}</p>}
-    </Reveal>
-  );
-}
-
-/** The five steps really are a sequence, so they're numbered. */
-export function ProcessSteps() {
-  return (
-    <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      {process.map((s, i) => (
-        <Reveal as="li" key={s.step} delay={i * 0.08} className="glass relative flex flex-col gap-3 overflow-hidden rounded-3xl p-6">
-          <span className="grad font-display text-5xl font-bold tracking-tight">{String(i + 1).padStart(2, '0')}</span>
-          <h3 className="text-lg font-bold">{s.step}</h3>
-          <p className="text-[15px] text-[var(--muted)]">{s.text}</p>
+    <div className="mb-14 grid gap-5">
+      <Reveal>
+        <span className="eyebrow">
+          {num && <b>{num}</b>}
+          {eyebrow}
+        </span>
+      </Reveal>
+      <SplitHeading className="sec-title max-w-[18ch]">{children}</SplitHeading>
+      {lede && (
+        <Reveal delay={0.15}>
+          <p className="lede">{lede}</p>
         </Reveal>
-      ))}
-    </ol>
+      )}
+    </div>
   );
 }
 
@@ -98,21 +90,5 @@ export function EducationList() {
         </Reveal>
       ))}
     </ol>
-  );
-}
-
-export function Marquee({ items }: { items: string[] }) {
-  const row = [...items, ...items];
-  return (
-    <div className="marquee overflow-hidden border-y border-[var(--line)] py-6" aria-label="Domains I design for">
-      <div className="marquee-track flex w-max items-center gap-10">
-        {row.map((d, i) => (
-          <span key={i} aria-hidden={i >= items.length || undefined} className="flex items-center gap-10 whitespace-nowrap font-display text-[clamp(26px,3.6vw,46px)] font-bold tracking-tight">
-            {d}
-            <i className="orb orb-teal relative inline-block h-3 w-3 not-italic" style={{ position: 'relative' } as CSSProperties} />
-          </span>
-        ))}
-      </div>
-    </div>
   );
 }

@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation';
 import { ViewTransition, type CSSProperties, type ReactNode } from 'react';
 import { CaseToc } from '@/components/CaseToc';
 import { Mock } from '@/components/Mock';
+import { PageTransition } from '@/components/PageTransition';
 import { Reveal } from '@/components/Reveal';
+import { WireToVisual } from '@/components/WireToVisual';
 import { projects } from '@/content/data';
 
 export const dynamicParams = false;
@@ -27,7 +29,7 @@ export default async function CaseStudy({ params }: PageProps<'/work/[slug]'>) {
   const p = projects[index];
   const next = projects[(index + 1) % projects.length];
 
-  const sections: { id: string; label: string; body: ReactNode }[] = [
+  const sections: { id: string; label: string; body: ReactNode; pinned?: boolean }[] = [
     { id: 'context', label: 'Context', body: <p className="text-[clamp(18px,1.7vw,22px)] leading-relaxed">{p.context}</p> },
     { id: 'problem', label: 'Problem', body: <blockquote className="problem">{p.problem}</blockquote> },
     {
@@ -76,36 +78,16 @@ export default async function CaseStudy({ params }: PageProps<'/work/[slug]'>) {
       ? [{
           id: 'wireframes',
           label: 'Wireframes',
+          pinned: true,
           body: (
             <>
               <p>{p.wireframes}</p>
-              <figure className="glass mt-6 overflow-hidden rounded-3xl p-2">
-                <div className="overflow-hidden rounded-[18px]">
-                  <Mock type={p.mock} hue={p.hue} wire />
-                </div>
-                <figcaption className="mono py-3 text-center !text-[11px]">Low-fidelity structure · schematic</figcaption>
-              </figure>
+              <WireToVisual type={p.mock} hue={p.hue} />
             </>
           ),
         }]
       : []),
-    ...(p.visual
-      ? [{
-          id: 'visual',
-          label: 'Visual design',
-          body: (
-            <>
-              <p>{p.visual}</p>
-              <figure className="glass mt-6 overflow-hidden rounded-3xl p-2">
-                <div className="overflow-hidden rounded-[18px]">
-                  <Mock type={p.mock} hue={p.hue} />
-                </div>
-                <figcaption className="mono py-3 text-center !text-[11px]">High-fidelity direction · schematic recreation</figcaption>
-              </figure>
-            </>
-          ),
-        }]
-      : []),
+    ...(p.visual ? [{ id: 'visual', label: 'Visual design', body: <p>{p.visual}</p> }] : []),
     ...(p.prototype ? [{ id: 'prototype', label: 'Prototype', body: <p>{p.prototype}</p> }] : []),
     ...(p.development ? [{ id: 'development', label: 'Development', body: <p>{p.development}</p> }] : []),
     {
@@ -126,6 +108,7 @@ export default async function CaseStudy({ params }: PageProps<'/work/[slug]'>) {
   ];
 
   return (
+    <PageTransition>
     <article style={{ '--h': p.hue } as CSSProperties}>
       <header className="relative overflow-hidden pt-36 pb-12">
         <span className="pointer-events-none absolute -top-40 right-0 -z-10 h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,hsl(var(--h)_70%_50%/.22),transparent_65%)]" aria-hidden="true" />
@@ -177,8 +160,8 @@ export default async function CaseStudy({ params }: PageProps<'/work/[slug]'>) {
           </div>
         </aside>
         <div className="grid min-w-0 gap-20">
-          {sections.map((s, i) => (
-            <Reveal as="section" key={s.id} className="cs-sec">
+          {sections.map((s, i) => {
+            const inner = (
               <div id={s.id} className="scroll-mt-28">
                 <h2>
                   <span>{String(i + 1).padStart(2, '0')}</span>
@@ -186,8 +169,14 @@ export default async function CaseStudy({ params }: PageProps<'/work/[slug]'>) {
                 </h2>
                 {s.body}
               </div>
-            </Reveal>
-          ))}
+            );
+            // Pinned sections can't sit inside a transformed (animated) parent.
+            return s.pinned ? (
+              <section key={s.id} className="cs-sec">{inner}</section>
+            ) : (
+              <Reveal as="section" key={s.id} className="cs-sec">{inner}</Reveal>
+            );
+          })}
         </div>
       </div>
 
@@ -201,5 +190,6 @@ export default async function CaseStudy({ params }: PageProps<'/work/[slug]'>) {
         </div>
       </Link>
     </article>
+    </PageTransition>
   );
 }

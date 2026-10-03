@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react';
 import { useRef, useState } from 'react';
 import { site } from '@/content/data';
+import { gsap, MOTION_OK, useGSAP } from '@/lib/gsap';
 import { usePreloaded } from '@/lib/usePreloaded';
 import { HeroCanvas } from './HeroCanvas';
 
@@ -38,6 +39,20 @@ export function Hero() {
   const mid = useDepth(mx, my, 0.5);
   const near = useDepth(mx, my, 1.3);
   const nearer = useDepth(mx, my, 1.8);
+
+  // Scrolling out of the hero: headline lines drift apart, the card lags behind.
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add(MOTION_OK, () => {
+        const lines = gsap.utils.toArray<HTMLElement>('.hero-line');
+        const st = { trigger: ref.current, start: 'top top', end: 'bottom top', scrub: 0.5 };
+        lines.forEach((l, i) => gsap.to(l, { xPercent: (i % 2 ? 1 : -1) * (18 + i * 6), opacity: 0.1, ease: 'none', scrollTrigger: st }));
+        gsap.to('.hero-card-lag', { yPercent: 12, ease: 'none', scrollTrigger: st });
+      });
+    },
+    { scope: ref }
+  );
 
   const onMove = (e: React.PointerEvent) => {
     if (reduce || e.pointerType !== 'mouse' || !ref.current) return;
@@ -76,10 +91,10 @@ export function Hero() {
           </motion.p>
 
           <h1 className="display text-[clamp(40px,4.9vw,74px)]" aria-label={site.intro}>
-            <motion.span {...show(0.1)} className="block" aria-hidden="true">I turn complex</motion.span>
-            <motion.span {...show(0.2)} className="block" aria-hidden="true">workflows into</motion.span>
-            <motion.span {...show(0.3)} className="block grad" aria-hidden="true">simple, purposeful</motion.span>
-            <motion.span {...show(0.4)} className="block" aria-hidden="true">experiences.</motion.span>
+            <motion.span {...show(0.1)} className="block" aria-hidden="true"><span className="hero-line inline-block">I turn complex</span></motion.span>
+            <motion.span {...show(0.2)} className="block" aria-hidden="true"><span className="hero-line inline-block">workflows into</span></motion.span>
+            <motion.span {...show(0.3)} className="block" aria-hidden="true"><span className="hero-line grad inline-block">simple, purposeful</span></motion.span>
+            <motion.span {...show(0.4)} className="block" aria-hidden="true"><span className="hero-line inline-block">experiences.</span></motion.span>
           </h1>
 
           <motion.p {...show(0.5)} className="lede">
@@ -97,6 +112,7 @@ export function Hero() {
         </div>
 
         {/* Photo on a glass plane, with floating info cards at different depths */}
+        <div className="hero-card-lag">
         <motion.div
           ref={cardRef}
           initial={reduce ? false : { opacity: 0, scale: 0.92 }}
@@ -128,6 +144,7 @@ export function Hero() {
           </motion.div>
           <motion.span style={nearer} className={`${cssOrb} orb orb-coral -left-14 top-[38%] h-16 w-16 max-sm:-left-4 max-sm:h-12 max-sm:w-12`} aria-hidden="true" />
         </motion.div>
+        </div>
       </div>
 
       <a href="#work" className="mono absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 !text-[10px] md:flex" aria-label="Scroll to selected work">

@@ -2,14 +2,16 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Reveal } from '@/components/Reveal';
-import { EducationList, ExperienceList, Exploring, ProcessSteps, SectionHead, SkillsGrid } from '@/components/Sections';
+import { PageTransition } from '@/components/PageTransition';
+import { ProcessSection } from '@/components/ProcessSection';
+import { EducationList, ExperienceList, Exploring, SectionHead, SkillsGrid } from '@/components/Sections';
 import { bio, principles, site } from '@/content/data';
 
 export const metadata: Metadata = { title: 'About', description: `About ${site.name}, ${site.role}.` };
 
 export default function AboutPage() {
   return (
-    <>
+    <PageTransition>
       <section className="pt-40 pb-16">
         <div className="container-x grid items-start gap-14 lg:grid-cols-[1.2fr_0.8fr]">
           <Reveal className="grid gap-8">
@@ -57,14 +59,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="section">
-        <div className="container-x">
+      <ProcessSection
+        head={
           <SectionHead num="02" eyebrow="Process">
             My design <span className="grad">process.</span>
           </SectionHead>
-          <ProcessSteps />
-        </div>
-      </section>
+        }
+      />
 
       <section className="section">
         <div className="container-x">
@@ -93,6 +94,6 @@ export default function AboutPage() {
           <EducationList />
         </div>
       </section>
-    </>
+    </PageTransition>
   );
 }

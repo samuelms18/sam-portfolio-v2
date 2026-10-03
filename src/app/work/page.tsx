@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ProjectCard } from '@/components/ProjectCard';
 import { Reveal } from '@/components/Reveal';
 import { WorkGrid } from '@/components/WorkGrid';
+import { PageTransition } from '@/components/PageTransition';
 import { projects } from '@/content/data';
 
 export const metadata: Metadata = {
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 export default function WorkPage() {
   return (
+    <PageTransition>
     <section className="pt-40 pb-24">
       <div className="container-x">
         <Reveal className="mb-12 grid gap-6">
@@ -32,5 +34,6 @@ export default function WorkPage() {
         <p className="mono mt-12 text-center !text-[11px]">Visuals are schematic recreations. Production data and screens are confidential.</p>
       </div>
     </section>
+    </PageTransition>
   );
 }

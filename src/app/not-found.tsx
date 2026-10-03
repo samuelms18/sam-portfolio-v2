@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import { PageTransition } from '@/components/PageTransition';
 
 export default function NotFound() {
   return (
+    <PageTransition>
     <section className="grid min-h-[80vh] place-items-center pt-32 pb-20">
       <div className="container-x grid justify-items-start gap-6">
         <span className="eyebrow"><b>404</b> Page not found</span>
@@ -12,5 +14,6 @@ export default function NotFound() {
         <Link href="/" className="btn btn-primary">Back home →</Link>
       </div>
     </section>
+    </PageTransition>
   );
 }

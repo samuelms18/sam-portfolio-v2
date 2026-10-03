@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ContactForm } from '@/components/ContactForm';
 import { Reveal } from '@/components/Reveal';
+import { PageTransition } from '@/components/PageTransition';
 import { site } from '@/content/data';
 
 export const metadata: Metadata = { title: 'Contact', description: `Contact ${site.name}.` };
@@ -10,6 +11,7 @@ const SOCIAL_NAMES: Record<string, string> = { linkedin: 'LinkedIn', github: 'Gi
 export default function ContactPage() {
   const socials = Object.entries(site.socials).filter(([, url]) => url);
   return (
+    <PageTransition>
     <section className="relative overflow-hidden pt-40 pb-24">
       <span className="orb orb-coral -right-20 top-40 -z-10 h-72 w-72 opacity-30 blur-2xl" aria-hidden="true" />
       <div className="container-x grid gap-14 lg:grid-cols-[1fr_1.2fr]">
@@ -44,5 +46,6 @@ export default function ContactPage() {
         </Reveal>
       </div>
     </section>
+    </PageTransition>
   );
 }
