@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from 'motion/react';
 import { useRef } from 'react';
-import { site } from '@/content/data';
+import type { Site } from '@/content/types';
 import { gsap, MOTION_OK, useGSAP } from '@/lib/gsap';
 import { usePreloaded } from '@/lib/usePreloaded';
 import { IntroVideo } from './IntroVideo';
@@ -17,7 +17,7 @@ function useDepth(mx: MotionValue<number>, my: MotionValue<number>, depth: numbe
   return { x, y };
 }
 
-export function Hero() {
+export function Hero({ site }: { site: Site }) {
   const ready = usePreloaded();
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
@@ -110,7 +110,7 @@ export function Hero() {
           className="relative mx-auto w-full max-w-[420px] max-lg:max-w-[340px]"
         >
           <div className="glass relative rounded-[28px] p-2.5 shadow-[var(--shadow)]">
-            <IntroVideo />
+            <IntroVideo site={site} />
           </div>
 
           <motion.div style={near} className="glass-dense pointer-events-none absolute -left-10 top-[42%] grid gap-0.5 rounded-2xl px-5 py-3.5 max-sm:-left-3">

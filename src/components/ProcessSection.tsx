@@ -1,14 +1,14 @@
 'use client';
 
 import { useRef, type ReactNode } from 'react';
-import { process } from '@/content/data';
+import type { ProcessStep } from '@/content/types';
 import { gsap, useGSAP } from '@/lib/gsap';
 
 /**
  * Desktop: the section pins and the five steps travel sideways as you scroll,
  * with a line tracking progress. Phones and reduced motion: a plain grid.
  */
-export function ProcessSection({ head }: { head: ReactNode }) {
+export function ProcessSection({ head, process }: { head: ReactNode; process: ProcessStep[] }) {
   const section = useRef<HTMLElement>(null);
   const track = useRef<HTMLOListElement>(null);
   const bar = useRef<HTMLDivElement>(null);

@@ -5,11 +5,15 @@ import { Reveal } from '@/components/Reveal';
 import { PageTransition } from '@/components/PageTransition';
 import { ProcessSection } from '@/components/ProcessSection';
 import { EducationList, ExperienceList, Exploring, SectionHead, SkillsGrid } from '@/components/Sections';
-import { bio, principles, site } from '@/content/data';
+import { getContent } from '@/content';
 
-export const metadata: Metadata = { title: 'About', description: `About ${site.name}, ${site.role}.` };
+export async function generateMetadata(): Promise<Metadata> {
+  const { site } = await getContent();
+  return { title: 'About', description: `About ${site.name}, ${site.role}.` };
+}
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { bio, principles, site, process } = await getContent();
   return (
     <PageTransition>
       <section className="pt-40 pb-16">
@@ -60,6 +64,7 @@ export default function AboutPage() {
       </section>
 
       <ProcessSection
+        process={process}
         head={
           <SectionHead num="02" eyebrow="Process">
             My design <span className="grad">process.</span>

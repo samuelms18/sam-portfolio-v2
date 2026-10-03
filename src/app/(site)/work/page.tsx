@@ -3,14 +3,15 @@ import { ProjectCard } from '@/components/ProjectCard';
 import { Reveal } from '@/components/Reveal';
 import { WorkGrid } from '@/components/WorkGrid';
 import { PageTransition } from '@/components/PageTransition';
-import { projects } from '@/content/data';
+import { getContent } from '@/content';
 
 export const metadata: Metadata = {
   title: 'Work',
   description: 'Case studies by Sam: enterprise UX, dashboards and workflow design.',
 };
 
-export default function WorkPage() {
+export default async function WorkPage() {
+  const { projects } = await getContent();
   return (
     <PageTransition>
     <section className="pt-40 pb-24">

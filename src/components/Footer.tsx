@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { site } from '@/content/data';
+import { getContent } from '@/content';
 
 const SOCIAL_NAMES: Record<string, string> = { linkedin: 'LinkedIn', github: 'GitHub', behance: 'Behance', dribbble: 'Dribbble' };
 
-export function Footer() {
+export async function Footer() {
+  const { site } = await getContent();
   const socials = Object.entries(site.socials).filter(([, url]) => url);
   return (
     <footer className="relative overflow-hidden border-t border-[var(--line)] pt-24 pb-10">

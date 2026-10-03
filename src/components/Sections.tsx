@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { education, experience, exploring, skills } from '@/content/data';
+import { getContent } from '@/content';
 import { Reveal } from './Reveal';
 import { SplitHeading } from './ScrollFX';
 
@@ -22,7 +22,8 @@ export function SectionHead({ eyebrow, num, children, lede }: { eyebrow: string;
   );
 }
 
-export function SkillsGrid() {
+export async function SkillsGrid() {
+  const { skills } = await getContent();
   return (
     <div className="grid gap-6 lg:grid-cols-[1.4fr_0.8fr_1fr]">
       {skills.map((g, i) => (
@@ -39,7 +40,8 @@ export function SkillsGrid() {
   );
 }
 
-export function Exploring() {
+export async function Exploring() {
+  const { exploring } = await getContent();
   return (
     <Reveal className="mt-6 flex flex-wrap items-center gap-4 rounded-3xl border border-dashed border-[var(--glass-line)] p-6">
       <span className="eyebrow">
@@ -54,7 +56,8 @@ export function Exploring() {
   );
 }
 
-export function ExperienceList() {
+export async function ExperienceList() {
+  const { experience } = await getContent();
   return (
     <ol className="grid gap-4">
       {experience.map((e, i) => (
@@ -78,7 +81,8 @@ export function ExperienceList() {
   );
 }
 
-export function EducationList() {
+export async function EducationList() {
+  const { education } = await getContent();
   return (
     <ol className="grid gap-4 md:grid-cols-2">
       {education.map((e, i) => (

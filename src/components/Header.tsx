@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { site } from '@/content/data';
 import { ThemeToggle } from './ThemeToggle';
 
 const NAV = [
@@ -12,7 +11,7 @@ const NAV = [
   { href: '/contact', label: 'Contact' },
 ];
 
-export function Header() {
+export function Header({ name, resume }: { name: string; resume: string }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -42,8 +41,8 @@ export function Header() {
         style={{ paddingTop: `calc(${scrolled ? '12px' : '20px'} + env(safe-area-inset-top, 0px))` }}
       >
         <div className="container-x flex items-center justify-between gap-4">
-          <Link href="/" className="font-display text-2xl font-extrabold tracking-tight" aria-label={`${site.name} — home`}>
-            {site.name.toLowerCase()}
+          <Link href="/" className="font-display text-2xl font-extrabold tracking-tight" aria-label={`${name} — home`}>
+            {name.toLowerCase()}
             <span className="text-[var(--teal)]">.</span>
           </Link>
 
@@ -63,8 +62,8 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            {site.resume && (
-              <a href={site.resume} download className="btn btn-ghost hidden !px-4 !py-2.5 text-sm md:inline-flex">
+            {resume && (
+              <a href={resume} download className="btn btn-ghost hidden !px-4 !py-2.5 text-sm md:inline-flex">
                 Resume ↓
               </a>
             )}

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ViewTransition, type CSSProperties, type ReactNode } from 'react';
@@ -7,16 +8,18 @@ import { Mock } from '@/components/Mock';
 import { PageTransition } from '@/components/PageTransition';
 import { Reveal } from '@/components/Reveal';
 import { WireToVisual } from '@/components/WireToVisual';
-import { projects } from '@/content/data';
+import { getContent } from '@/content';
 
 export const dynamicParams = false;
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const { projects } = await getContent();
   return projects.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<'/work/[slug]'>): Promise<Metadata> {
   const { slug } = await params;
+  const { projects } = await getContent();
   const p = projects.find((x) => x.slug === slug);
   if (!p) return {};
   return { title: `${p.title} — ${p.subtitle}`, description: p.summary };
@@ -24,6 +27,7 @@ export async function generateMetadata({ params }: PageProps<'/work/[slug]'>): P
 
 export default async function CaseStudy({ params }: PageProps<'/work/[slug]'>) {
   const { slug } = await params;
+  const { projects } = await getContent();
   const index = projects.findIndex((x) => x.slug === slug);
   if (index < 0) notFound();
   const p = projects[index];
@@ -88,6 +92,23 @@ export default async function CaseStudy({ params }: PageProps<'/work/[slug]'>) {
         }]
       : []),
     ...(p.visual ? [{ id: 'visual', label: 'Visual design', body: <p>{p.visual}</p> }] : []),
+    ...(p.screens?.length
+      ? [{
+          id: 'screens',
+          label: 'Screens',
+          body: (
+            <div className="grid gap-6">
+              {p.screens.map((sc, i) => (
+                <figure key={sc.src} className="glass overflow-hidden rounded-3xl p-2">
+                  {/* Unknown aspect ratios: render at natural size, capped to the column */}
+                  <Image src={sc.src} alt={sc.alt || `${p.title} screen ${i + 1}`} width={2400} height={1500} sizes="(max-width: 1024px) 100vw, 900px" className="h-auto w-full rounded-[18px]" />
+                  {sc.caption && <figcaption className="mono py-3 text-center !text-[11px]">{sc.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          ),
+        }]
+      : []),
     ...(p.prototype ? [{ id: 'prototype', label: 'Prototype', body: <p>{p.prototype}</p> }] : []),
     ...(p.development ? [{ id: 'development', label: 'Development', body: <p>{p.development}</p> }] : []),
     {
@@ -137,11 +158,17 @@ export default async function CaseStudy({ params }: PageProps<'/work/[slug]'>) {
           <ViewTransition name={`project-${p.slug}`} share="morph" default="none">
             <div className="glass overflow-hidden rounded-[32px] p-2.5">
               <div className="overflow-hidden rounded-[24px]">
-                <Mock type={p.mock} hue={p.hue} className="md:!aspect-[16/8]" />
+                {p.cover ? (
+                  <div className="relative aspect-[16/9] md:aspect-[16/8]">
+                    <Image src={p.cover} alt={`${p.title} — cover`} fill priority sizes="(max-width: 1280px) 100vw, 1200px" className="object-cover" />
+                  </div>
+                ) : (
+                  <Mock type={p.mock} hue={p.hue} className="md:!aspect-[16/8]" />
+                )}
               </div>
             </div>
           </ViewTransition>
-          <p className="mono text-center !text-[11px]">Visuals are schematic recreations. Production data and screens are confidential.</p>
+          {!p.cover && <p className="mono text-center !text-[11px]">Visuals are schematic recreations. Production data and screens are confidential.</p>}
         </div>
       </header>
 

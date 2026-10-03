@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ViewTransition, type CSSProperties } from 'react';
 import type { Project } from '@/content/types';
@@ -15,7 +16,13 @@ export function ProjectCard({ project: p, index, total, size = 'md' }: Props) {
     >
       <ViewTransition name={`project-${p.slug}`} share="morph" default="none">
         <div className="overflow-hidden rounded-[20px]">
-          <Mock type={p.mock} hue={p.hue} className="transition-transform duration-700 group-hover:scale-[1.03]" />
+          {p.cover ? (
+            <div className="relative aspect-[16/10.5] overflow-hidden">
+              <Image src={p.cover} alt={`${p.title} — cover`} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+          ) : (
+            <Mock type={p.mock} hue={p.hue} className="transition-transform duration-700 group-hover:scale-[1.03]" />
+          )}
         </div>
       </ViewTransition>
       <div className={`flex flex-1 flex-col gap-3 ${size === 'lg' ? 'p-6 md:p-8' : 'p-5 md:p-6'}`}>

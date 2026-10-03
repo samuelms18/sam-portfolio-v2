@@ -8,12 +8,13 @@ import { PageTransition } from '@/components/PageTransition';
 import { ProcessSection } from '@/components/ProcessSection';
 import { DepthIn } from '@/components/ScrollFX';
 import { ExperienceList, Exploring, SectionHead, SkillsGrid } from '@/components/Sections';
-import { bio, domains, projects, site } from '@/content/data';
+import { getContent } from '@/content';
 
-export default function Home() {
+export default async function Home() {
+  const { bio, domains, projects, site, process } = await getContent();
   return (
     <PageTransition>
-      <Hero />
+      <Hero site={site} />
       <Marquee items={domains} />
 
       <section id="work" className="section">
@@ -78,6 +79,7 @@ export default function Home() {
       </section>
 
       <ProcessSection
+        process={process}
         head={
           <SectionHead num="03" eyebrow="Process">
             From messy requirements <span className="grad">to shipped screens.</span>

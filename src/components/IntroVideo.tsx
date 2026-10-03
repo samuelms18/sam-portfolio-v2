@@ -3,14 +3,14 @@
 import Image from 'next/image';
 import { useReducedMotion } from 'motion/react';
 import { useRef } from 'react';
-import { site } from '@/content/data';
+import type { Site } from '@/content/types';
 
 /**
  * Hero self-intro. A short muted preview loops in the card (browsers only allow
  * silent autoplay); "Watch my intro" opens the full video with sound in a dialog.
  * Without `site.introVideo` the card simply shows the photo.
  */
-export function IntroVideo() {
+export function IntroVideo({ site }: { site: Site }) {
   const reduce = useReducedMotion();
   const dialog = useRef<HTMLDialogElement>(null);
   const full = useRef<HTMLVideoElement>(null);

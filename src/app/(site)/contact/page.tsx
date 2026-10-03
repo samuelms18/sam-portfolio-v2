@@ -2,13 +2,14 @@ import type { Metadata } from 'next';
 import { ContactForm } from '@/components/ContactForm';
 import { Reveal } from '@/components/Reveal';
 import { PageTransition } from '@/components/PageTransition';
-import { site } from '@/content/data';
+import { getContent } from '@/content';
 
-export const metadata: Metadata = { title: 'Contact', description: `Contact ${site.name}.` };
+export const metadata: Metadata = { title: 'Contact', description: 'Get in touch about UI/UX, product design and UI/UX developer roles.' };
 
 const SOCIAL_NAMES: Record<string, string> = { linkedin: 'LinkedIn', github: 'GitHub', behance: 'Behance', dribbble: 'Dribbble' };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const { site } = await getContent();
   const socials = Object.entries(site.socials).filter(([, url]) => url);
   return (
     <PageTransition>

@@ -42,6 +42,10 @@ export type Project = {
   mock: MockType;
   /** Hue (0–360) that tints this project's accents. */
   hue: number;
+  /** Real cover screenshot (replaces the drawn illustration). */
+  cover?: string;
+  /** Additional real screenshots. */
+  screens?: Screen[];
   context: string;
   problem: string;
   myRole: string;
@@ -55,8 +59,23 @@ export type Project = {
   learnings: string;
 };
 
+export type Screen = { src: string; alt?: string; caption?: string };
+
 export type Experience = { company: string; role: string; period: string; text: string; highlights?: string[] };
 export type Education = { title: string; place: string; year: string; grade?: string };
 export type SkillGroup = { group: string; items: string[] };
 export type Principle = { title: string; text: string };
 export type ProcessStep = { step: string; text: string };
+
+export type Content = {
+  site: Site;
+  bio: string[];
+  domains: string[];
+  principles: Principle[];
+  process: ProcessStep[];
+  skills: SkillGroup[];
+  exploring: string[];
+  experience: Experience[];
+  education: Education[];
+  projects: Project[];
+};

@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { site } from '@/content/data';
 
 /**
  * First visit per session: an orb gathers light while a counter runs to 100,
  * then the panel lifts away. The inline script in <head> decides whether to show it,
  * so returning visitors never see a flash.
  */
-export function Preloader() {
+export function Preloader({ name }: { name: string }) {
   const [count, setCount] = useState(0);
   const [phase, setPhase] = useState<'idle' | 'leave' | 'done'>('idle');
 
@@ -67,7 +66,7 @@ export function Preloader() {
       <div className="flex w-[min(320px,80vw)] flex-col gap-3">
         <div className="flex items-baseline justify-between">
           <span className="font-display text-2xl font-extrabold">
-            {site.name.toLowerCase()}
+            {name.toLowerCase()}
             <span className="text-[var(--teal)]">.</span>
           </span>
           <span className="mono tabular-nums !text-[var(--text)]">{String(count).padStart(3, '0')}</span>
