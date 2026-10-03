@@ -9,7 +9,7 @@ Portfolio of **Sam, UI/UX Designer & UI/UX Developer**, built in the **Depth** d
 | Stage | What | Status |
 |---|---|---|
 | 1 | Foundation: design system, all pages, content, preloader, theme toggle, page-to-case-study morph | ✅ |
-| 2 | Real 3D hero (React Three Fiber): lit planet, orbiting sphere, glass spheres, procedural studio lighting | ✅ |
+| 2 | 3D hero "The Untangling": a glass knot around the photo that untangles into a clean ring on scroll, plus floating 3D UI objects | ✅ |
 | 3 | Scroll storytelling (GSAP ScrollTrigger) and route transitions | Next |
 | 4 | Sanity CMS: edit projects, photos and text from a dashboard | |
 

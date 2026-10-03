@@ -1,8 +1,8 @@
 'use client';
 
-import { Environment, Float, Lightformer, MeshTransmissionMaterial } from '@react-three/drei';
+import { Environment, Float, Lightformer, RoundedBox } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef, type ReactNode } from 'react';
+import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
 import * as THREE from 'three';
 
 type Props = {
@@ -16,11 +16,56 @@ type Props = {
 
 const TEAL = '#1fd1b2';
 const CORAL = '#ff7a59';
+const TUBULAR = 420;
+const RADIAL = 24;
+const TUBE = 0.075;
 
 /**
- * Converts the anchor's on-screen box into world units every frame, so the
- * scene stays wrapped around the photo card at any viewport size.
+ * "The Untangling": a torus knot (complex workflow) with a morph target that is
+ * a clean ring (simple experience) built with the exact same vertex layout.
+ * Scrolling the hero drives the morph from knot to ring.
  */
+function useKnotToRing() {
+  return useMemo(() => {
+    const geo = new THREE.TorusKnotGeometry(1, TUBE, TUBULAR, RADIAL, 2, 3);
+    const ringPos: number[] = [];
+    const ringNor: number[] = [];
+    const R = 1.25;
+    const tube = TUBE;
+    const P1 = new THREE.Vector3();
+    const P2 = new THREE.Vector3();
+    const T = new THREE.Vector3();
+    const N = new THREE.Vector3();
+    const B = new THREE.Vector3();
+    const v3 = new THREE.Vector3();
+    // Mirrors TorusKnotGeometry's loop (same i/j order) but walks a circle.
+    for (let i = 0; i <= TUBULAR; i++) {
+      const a = (i / TUBULAR) * Math.PI * 2;
+      P1.set(Math.cos(a) * R, Math.sin(a) * R, 0);
+      P2.set(Math.cos(a + 0.01) * R, Math.sin(a + 0.01) * R, 0);
+      T.subVectors(P2, P1);
+      N.addVectors(P2, P1);
+      B.crossVectors(T, N);
+      N.crossVectors(B, T);
+      B.normalize();
+      N.normalize();
+      for (let j = 0; j <= RADIAL; j++) {
+        const v = (j / RADIAL) * Math.PI * 2;
+        const cx = -tube * Math.cos(v);
+        const cy = tube * Math.sin(v);
+        v3.set(P1.x + cx * N.x + cy * B.x, P1.y + cx * N.y + cy * B.y, P1.z + cx * N.z + cy * B.z);
+        ringPos.push(v3.x, v3.y, v3.z);
+        v3.sub(P1).normalize();
+        ringNor.push(v3.x, v3.y, v3.z);
+      }
+    }
+    geo.morphAttributes.position = [new THREE.Float32BufferAttribute(ringPos, 3)];
+    geo.morphAttributes.normal = [new THREE.Float32BufferAttribute(ringNor, 3)];
+    return geo;
+  }, []);
+}
+
+/** Converts the anchor's on-screen box into world units every frame. */
 function useAnchorBox(anchor: HTMLElement) {
   const { viewport, size, gl } = useThree();
   const box = useRef({ x: 0, y: 0, w: 2, h: 2.6 });
@@ -39,30 +84,119 @@ function useAnchorBox(anchor: HTMLElement) {
 function Floaty({ children, still, speed = 1.4 }: { children: ReactNode; still: boolean; speed?: number }) {
   if (still) return <>{children}</>;
   return (
-    <Float speed={speed} rotationIntensity={0.4} floatIntensity={0.6}>
+    <Float speed={speed} rotationIntensity={0.5} floatIntensity={0.7}>
       {children}
     </Float>
   );
 }
 
+const BAR_HEIGHTS = [0.45, 0.8, 0.6, 1.05];
+const BAR_COLORS = ['#0f7f6c', '#17a88f', TEAL, CORAL];
+
+/** Mini dashboard bar chart. */
+function BarChart({ still }: { still: boolean }) {
+  const bars = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (still || !bars.current) return;
+    bars.current.children.forEach((b, i) => {
+      const s = 1 + Math.sin(state.clock.elapsedTime * 1.4 + i) * 0.12;
+      b.scale.y = s;
+      b.position.y = (BAR_HEIGHTS[i] * s) / 2 + 0.04;
+    });
+  });
+  return (
+    <group rotation={[0.25, 0.5, 0]}>
+      <RoundedBox args={[1.3, 0.08, 0.55]} radius={0.04} smoothness={4}>
+        <meshPhysicalMaterial color="#eaf6f2" roughness={0.2} transmission={0.6} thickness={0.5} clearcoat={1} />
+      </RoundedBox>
+      <group ref={bars} position={[-0.42, 0, 0]}>
+        {BAR_HEIGHTS.map((h, i) => (
+          <RoundedBox key={i} args={[0.2, h, 0.2]} radius={0.06} smoothness={4} position={[i * 0.28, h / 2 + 0.04, 0]}>
+            <meshPhysicalMaterial color={BAR_COLORS[i]} roughness={0.25} clearcoat={1} />
+          </RoundedBox>
+        ))}
+      </group>
+    </group>
+  );
+}
+
+/** A toggle switch that flips on and off. */
+function Toggle({ still }: { still: boolean }) {
+  const knob = useRef<THREE.Mesh>(null);
+  const track = useRef<THREE.MeshPhysicalMaterial>(null);
+  const off = useMemo(() => new THREE.Color('#5d7570'), []);
+  const on = useMemo(() => new THREE.Color(CORAL), []);
+  useFrame((state, delta) => {
+    const isOn = still || Math.sin(state.clock.elapsedTime * 1.2) > 0;
+    if (!knob.current) return;
+    knob.current.position.x = THREE.MathUtils.damp(knob.current.position.x, isOn ? 0.25 : -0.25, 8, delta);
+    track.current?.color.lerpColors(off, on, THREE.MathUtils.clamp(knob.current.position.x / 0.5 + 0.5, 0, 1));
+  });
+  return (
+    <group rotation={[0.2, -0.4, 0.05]}>
+      <RoundedBox args={[1, 0.5, 0.28]} radius={0.24} smoothness={6}>
+        <meshPhysicalMaterial ref={track} color={CORAL} roughness={0.25} clearcoat={1} />
+      </RoundedBox>
+      <mesh ref={knob} position={[0.25, 0, 0.12]}>
+        <sphereGeometry args={[0.19, 32, 32]} />
+        <meshPhysicalMaterial color="#ffffff" roughness={0.15} clearcoat={1} />
+      </mesh>
+    </group>
+  );
+}
+
+/** A mouse pointer that "clicks". */
+function Cursor({ still }: { still: boolean }) {
+  const ref = useRef<THREE.Group>(null);
+  const geo = useMemo(() => {
+    const s = new THREE.Shape();
+    s.moveTo(0, 0);
+    s.lineTo(0, -1);
+    s.lineTo(0.27, -0.76);
+    s.lineTo(0.46, -1.16);
+    s.lineTo(0.61, -1.09);
+    s.lineTo(0.42, -0.7);
+    s.lineTo(0.76, -0.7);
+    s.closePath();
+    const g = new THREE.ExtrudeGeometry(s, { depth: 0.14, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.035, bevelSegments: 4 });
+    g.center();
+    return g;
+  }, []);
+  useFrame((state) => {
+    if (still || !ref.current) return;
+    const k = (state.clock.elapsedTime * 0.9) % 2;
+    ref.current.scale.setScalar(k > 1.8 ? 0.88 : 1); // a quick "click"
+  });
+  return (
+    <group ref={ref} rotation={[0.1, -0.3, 0.25]}>
+      <mesh geometry={geo}>
+        <meshPhysicalMaterial color="#ffffff" roughness={0.2} clearcoat={1} />
+      </mesh>
+    </group>
+  );
+}
+
 function Scene({ anchor, reduceMotion }: Pick<Props, 'anchor' | 'reduceMotion'>) {
   const box = useAnchorBox(anchor);
-  const rig = useRef<THREE.Group>(null);
-  const planet = useRef<THREE.Mesh>(null);
-  const orbiter = useRef<THREE.Group>(null);
-  const ring = useRef<THREE.Mesh>(null);
-  const glassA = useRef<THREE.Group>(null);
-  const glassB = useRef<THREE.Group>(null);
-  const pearl = useRef<THREE.Group>(null);
-  const ringTilt = useMemo(() => new THREE.Euler(1.28, -0.22, 0.18), []);
+  const knotGeo = useKnotToRing();
   const narrow = useThree((s) => s.size.width < 768);
-  const orbitPos = useMemo(() => new THREE.Vector3(), []);
+  const rig = useRef<THREE.Group>(null);
+  const knot = useRef<THREE.Mesh>(null);
+  const chart = useRef<THREE.Group>(null);
+  const toggle = useRef<THREE.Group>(null);
+  const cursor = useRef<THREE.Group>(null);
+  const morph = useRef(0);
+
+  useLayoutEffect(() => knot.current?.updateMorphTargets(), []);
 
   useFrame((state, delta) => {
     const { x, y, w, h } = box.current;
-    const t = state.clock.elapsedTime;
 
-    // Whole scene follows the card and leans toward the pointer.
+    // Scrolling through the hero untangles the knot into a ring.
+    const target = reduceMotion ? 0 : THREE.MathUtils.smoothstep(window.scrollY / (window.innerHeight * 0.35), 0, 1);
+    morph.current = THREE.MathUtils.damp(morph.current, target, 4, delta);
+    const m = morph.current;
+
     if (rig.current) {
       rig.current.position.set(x, y, 0);
       if (!reduceMotion) {
@@ -71,69 +205,63 @@ function Scene({ anchor, reduceMotion }: Pick<Props, 'anchor' | 'reduceMotion'>)
       }
     }
 
-    // Planet: behind the card, top-right.
-    planet.current?.position.set(w * (narrow ? 0.4 : 0.62), h * (narrow ? 0.12 : 0.28), -2.4);
-    planet.current?.scale.setScalar(w * (narrow ? 0.5 : 0.78));
-    if (planet.current && !reduceMotion) planet.current.rotation.y += delta * 0.08;
-
-    // Orbit ring and the coral sphere riding it (passes behind the card).
-    const R = w * 0.78;
-    ring.current?.scale.setScalar(R);
-    if (orbiter.current) {
-      const a = reduceMotion ? 2.4 : t * 0.45;
-      orbiter.current.position.copy(orbitPos.set(Math.cos(a) * R, Math.sin(a) * R, 0).applyEuler(ringTilt));
-      orbiter.current.scale.setScalar(w * 0.13);
+    const k = knot.current;
+    if (k) {
+      if (k.morphTargetInfluences) k.morphTargetInfluences[0] = m;
+      // Tilted like a planetary ring around the card: tangled loops cross on both
+      // sides of the photo, and the untangled ring reads as a clean orbit.
+      k.position.set(w * (narrow ? 0.04 : 0.16), -h * 0.02, -1.6);
+      k.scale.setScalar(w * (narrow ? 0.5 : 0.68));
+      k.rotation.x = 1.12 + (reduceMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.4) * 0.06 * (1 - m));
+      k.rotation.y = -0.18 * (1 - m);
+      if (!reduceMotion) k.rotation.z += delta * (0.12 + 0.22 * (1 - m));
     }
 
-    glassA.current?.position.set(w * 0.56, -h * 0.6, 0.4);
-    glassA.current?.scale.setScalar(w * 0.075);
-    glassB.current?.position.set(-w * 0.72, h * 0.44, 0.4);
-    glassB.current?.scale.setScalar(w * 0.06);
-    pearl.current?.position.set(-w * 1.15, -h * 0.5, -0.5);
-    pearl.current?.scale.setScalar(w * 0.05);
+    // UI objects sit in the free space around the card, clear of the headline.
+    chart.current?.position.set(-w * 0.36, h * 0.62, 0.6);
+    chart.current?.scale.setScalar(w * 0.15);
+    toggle.current?.position.set(w * 0.4, -h * 0.63, 0.4);
+    toggle.current?.scale.setScalar(w * 0.13);
+    cursor.current?.position.set(w * (narrow ? 0.42 : -0.6), -h * (narrow ? 0.5 : 0.6), 0.9);
+    cursor.current?.scale.setScalar(w * (narrow ? 0.1 : 0.12));
   });
 
   return (
     <group ref={rig}>
-      <mesh ref={planet}>
-        <sphereGeometry args={[1, 96, 96]} />
-        <meshPhysicalMaterial color={TEAL} roughness={0.22} metalness={0.05} clearcoat={1} clearcoatRoughness={0.15} emissive="#0a5c50" emissiveIntensity={0.35} />
+      <mesh ref={knot} geometry={knotGeo}>
+        <meshPhysicalMaterial
+          color={TEAL}
+          roughness={0.12}
+          metalness={0.1}
+          clearcoat={1}
+          clearcoatRoughness={0.08}
+          iridescence={1}
+          iridescenceIOR={1.4}
+          iridescenceThicknessRange={[200, 600]}
+          transmission={0.35}
+          thickness={1.2}
+          ior={1.4}
+          emissive="#0a5c50"
+          emissiveIntensity={0.25}
+        />
       </mesh>
-
-      <mesh ref={ring} rotation={ringTilt}>
-        <torusGeometry args={[1, 0.0035, 12, 160]} />
-        <meshBasicMaterial color={TEAL} transparent opacity={0.35} />
-      </mesh>
-
-      <group ref={orbiter}>
-        <mesh>
-          <sphereGeometry args={[1, 64, 64]} />
-          <meshPhysicalMaterial color={CORAL} roughness={0.25} clearcoat={1} clearcoatRoughness={0.1} emissive="#8a2a17" emissiveIntensity={0.25} />
-        </mesh>
-      </group>
-
-      <group ref={glassA}>
-        <Floaty still={reduceMotion}>
-          <mesh>
-            <sphereGeometry args={[1, 64, 64]} />
-            <MeshTransmissionMaterial transmissionSampler thickness={1.2} roughness={0.05} ior={1.35} chromaticAberration={0.08} backside color="#bff7ea" iridescence={0.6} />
-          </mesh>
-        </Floaty>
-      </group>
-      <group ref={glassB}>
-        <Floaty still={reduceMotion} speed={1.1}>
-          <mesh>
-            <sphereGeometry args={[1, 48, 48]} />
-            <MeshTransmissionMaterial transmissionSampler thickness={1} roughness={0.08} ior={1.3} chromaticAberration={0.06} color="#c9faee" iridescence={0.5} />
-          </mesh>
-        </Floaty>
-      </group>
-      <group ref={pearl}>
-        <Floaty still={reduceMotion} speed={0.9}>
-          <mesh>
-            <sphereGeometry args={[1, 32, 32]} />
-            <meshPhysicalMaterial color="#e9fffa" roughness={0.3} clearcoat={1} />
-          </mesh>
+      {!narrow && (
+        <>
+          <group ref={chart}>
+            <Floaty still={reduceMotion}>
+              <BarChart still={reduceMotion} />
+            </Floaty>
+          </group>
+          <group ref={toggle}>
+            <Floaty still={reduceMotion} speed={1.1}>
+              <Toggle still={reduceMotion} />
+            </Floaty>
+          </group>
+        </>
+      )}
+      <group ref={cursor}>
+        <Floaty still={reduceMotion} speed={1.6}>
+          <Cursor still={reduceMotion} />
         </Floaty>
       </group>
     </group>

@@ -36,7 +36,9 @@ export function Header() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${scrolled ? 'py-3' : 'py-5'}`}
+        className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-500 ${
+          scrolled ? 'border-[var(--line)] bg-[color-mix(in_srgb,var(--bg)_70%,transparent)] pb-3 backdrop-blur-xl' : 'border-transparent pb-5'
+        }`}
         style={{ paddingTop: `calc(${scrolled ? '12px' : '20px'} + env(safe-area-inset-top, 0px))` }}
       >
         <div className="container-x flex items-center justify-between gap-4">
