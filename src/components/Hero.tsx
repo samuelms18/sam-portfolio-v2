@@ -148,7 +148,7 @@ export function Hero() {
       </div>
 
       <a href="#work" className="mono absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 !text-[10px] md:flex" aria-label="Scroll to selected work">
-        Scroll to untangle
+        Scroll
         <span className="h-10 w-px bg-gradient-to-b from-[var(--teal)] to-transparent" />
       </a>
     </section>

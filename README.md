@@ -9,7 +9,7 @@ Portfolio of **Sam, UI/UX Designer & UI/UX Developer**, built in the **Depth** d
 | Stage | What | Status |
 |---|---|---|
 | 1 | Foundation: design system, all pages, content, preloader, theme toggle, page-to-case-study morph | ✅ |
-| 2 | 3D hero "The Untangling": a glass knot around the photo that untangles into a clean ring on scroll, plus floating 3D UI objects | ✅ |
+| 2 | 3D hero: floating glass UI screens (dashboard, mobile app, planner, widgets) layered around the photo; they snap into an aligned layout on scroll | ✅ |
 | 3 | Scroll storytelling (GSAP): masked heading reveals, depth-in cards, pinned horizontal process, pinned wireframe → visual wipe, scroll-reactive marquee, hero scroll-out, page transitions | ✅ |
 | 4 | Sanity CMS: edit projects, photos and text from a dashboard | Next |
 
